@@ -1,0 +1,28 @@
+on:
+  workflow_call:
+    inputs:
+      channel:
+        required: true
+        type: string
+      repository:
+        required: true
+        type: string
+      message:
+        required: true
+        type: string
+      name:
+        required: true
+        type: string
+
+jobs:
+  notify_slack_push:
+    name: Notify Slack on pushes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: abinoda/slack-action@master
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        with:
+        # message to send to slack
+          args: '{\"channel\":\"${{ inputs.channel }}\",\"blocks\":[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Repository pushed to:* ${{ inputs.repository }}\"}},{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Pusher:* ${{ inputs.name }}\n*Commit Message:* ${{ inputs.message }}\"}}]}' 
+        if: success()
