@@ -13,9 +13,9 @@ on:
       name:
         required: true
         type: string
-  secrets:
-    SLACK_GITHUB_ACTIONS_TOKEN:
-      required: true
+      SLACK_GITHUB_ACTIONS_TOKEN:
+        required: true
+        type: string
 
 jobs:
   notify_slack_push:
