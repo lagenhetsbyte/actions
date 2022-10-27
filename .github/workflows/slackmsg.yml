@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: abinoda/slack-action@master
         env:
-          SLACK_GITHUB_ACTIONS_TOKEN: ${{ secrets.slackToken }}
+          SLACK_BOT_TOKEN: ${{ secrets.slackToken }}
         with:
         # message to send to slack
           args: '{\"channel\":\"${{ inputs.channelId }}\",\"blocks\":[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Projekt:* ${{ inputs.repository }}\"}},{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Av:* ${{ inputs.name }}\n*Ändringar:* ${{ inputs.message }}\"}}]}' 
