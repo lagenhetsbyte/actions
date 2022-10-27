@@ -26,5 +26,5 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.slackToken }}
         with:
         # message to send to slack
-          args: '{\"channel\":\"${{ inputs.channelId }}\",\"blocks\":[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Projekt:* ${{ inputs.repository }}\"}},{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Av:* ${{ inputs.name }}\n*Ändringar:* ${{ inputs.message }}\"}}]}' 
+          args: '{\"channel\":\"${{ secrets.channelId }}\",\"blocks\":[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Projekt:* ${{ inputs.repository }}\"}},{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Av:* ${{ inputs.name }}\n*Ändringar:* ${{ inputs.message }}\"}}]}' 
         if: success()
