@@ -1,9 +1,6 @@
 on:
   workflow_call:
     inputs:
-      channelId:
-        required: true
-        type: string
       repository:
         required: true
         type: string
@@ -13,9 +10,11 @@ on:
       name:
         required: true
         type: string
-      SLACK_GITHUB_ACTIONS_TOKEN:
+    secrets:
+      channelId: 
         required: true
-        type: string
+      slackToken:
+        required: true
 
 jobs:
   notify_slack_push:
@@ -24,7 +23,7 @@ jobs:
     steps:
       - uses: abinoda/slack-action@master
         env:
-          SLACK_GITHUB_ACTIONS_TOKEN: ${{ secrets.SLACK_GITHUB_ACTIONS_TOKEN }}
+          SLACK_GITHUB_ACTIONS_TOKEN: ${{ secrets.slackToken }}
         with:
         # message to send to slack
           args: '{\"channel\":\"${{ inputs.channelId }}\",\"blocks\":[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Projekt:* ${{ inputs.repository }}\"}},{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Av:* ${{ inputs.name }}\n*Ändringar:* ${{ inputs.message }}\"}}]}' 
