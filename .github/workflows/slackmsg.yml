@@ -1,15 +1,5 @@
 on:
   workflow_call:
-    inputs:
-      repository:
-        required: true
-        type: string
-      message:
-        required: true
-        type: string
-      name:
-        required: true
-        type: string
     secrets:
       channelId: 
         required: true
@@ -26,5 +16,5 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.slackToken }}
         with:
         # message to send to slack
-          args: '{\"channel\":\"${{ secrets.channelId }}\",\"blocks\":[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Projekt:* ${{ inputs.repository }}\"}},{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Av:* ${{ inputs.name }}\n*Ändringar:* ${{ inputs.message }}\"}}]}' 
+          args: '{\"channel\":\"${{ secrets.channelId }}\",\"blocks\":[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Projekt:* ${{ github.event.repository.name }}\"}},{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Av:* ${{ github.event.pusher.name }}\n*Ändringar:* ${{ github.event.head_commit.message }}\"}},{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"<${{ github.event.compare }}|Kolla ändringar>\"}}]}' 
         if: success()
