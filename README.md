@@ -8,7 +8,7 @@ Example usage from BytesansokanApi, Note that we change channelId based on if th
 channels saved in organization secrets,
 BA: SLACK_BA_CHANGELOG_CHANNEL_ID
 LB: SLACK_LB_CHANGELOG_CHANNEL_ID
-`
+```
 name: Write to changelog channel
 
 on: 
@@ -26,4 +26,4 @@ jobs:
     secrets:
       channelId: ${{ secrets.SLACK_BA_CHANGELOG_CHANNEL_ID }}
       slackToken: ${{ secrets.SLACK_GITHUB_ACTIONS_TOKEN }}
-`
+```
