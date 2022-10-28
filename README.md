@@ -19,10 +19,6 @@ on:
 jobs:
   call-slack-workflow:
     uses: lagenhetsbyte/actions/.github/workflows/slackmsg.yml@master
-    with:
-      repository: ${{ github.event.repository.name }}
-      message: ${{ github.event.head_commit.message }}
-      name: ${{ github.event.pusher.name }}
     secrets:
       channelId: ${{ secrets.SLACK_BA_CHANGELOG_CHANNEL_ID }}
       slackToken: ${{ secrets.SLACK_GITHUB_ACTIONS_TOKEN }}
