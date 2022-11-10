@@ -16,30 +16,5 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.slackToken }}
         with:
           # message to send to slack
-          args: '{
-                  "channel":"${{ secrets.channelId }}",
-                  "blocks":[
-                    {
-                      "type":"section",
-                      "text":{
-                        "type":"mrkdwn",
-                        "text":"*Projekt:* ${{ github.event.repository.name }}"
-                      }
-                    },
-                    {
-                      "type":"section",
-                      "text":{
-                        "type":"mrkdwn",
-                        "text":"*Av:* ${{ github.event.pusher.name }}"
-                      }
-                    },
-                    {
-                      "type":"section",
-                      "text":{
-                        "type":"mrkdwn",
-                        "text":"<${{ github.ref }}|Kolla PR>"
-                      }
-                    }
-                  ]
-                }'
+          args: '{\"channel\":\"${{ secrets.channelId }}\",\"blocks\":[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Projekt:* ${{ github.event.repository.name }}\"}},{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Av:* ${{ github.event.pusher.name }}\"}},{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"<${{ github.ref }}|Kolla PR>\"}}]}'
         if: success()
