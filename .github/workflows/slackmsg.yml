@@ -8,10 +8,10 @@ on:
 
 jobs:
   notify_slack_push:
-    name: Notify Slack on pushes
+    name: Notify Slack commit on pushes
     runs-on: ubuntu-latest
     steps:
-      - name: Send Slack message on push
+      - name: Notify Slack commit
         env:
           SLACK_BOT_TOKEN: ${{ secrets.slackToken }}
           CHANNEL_ID: ${{ secrets.channelId }}
