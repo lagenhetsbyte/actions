@@ -1,20 +1,58 @@
 on:
   workflow_call:
     secrets:
-      channelId: 
+      channelId:
         required: true
       slackToken:
         required: true
 
 jobs:
   notify_slack_push:
-    name: Notify Slack on pushes
+    name: Notify Slack commit on pushes
     runs-on: ubuntu-latest
     steps:
-      - uses: abinoda/slack-action@master
+      - name: Notify Slack commit
         env:
           SLACK_BOT_TOKEN: ${{ secrets.slackToken }}
-        with:
-        # message to send to slack
-          args: '{\"channel\":\"${{ secrets.channelId }}\",\"blocks\":[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*[${{ github.event.repository.name }}]:* ${{ github.event.head_commit.message }}\n *Av:* ${{ github.event.pusher.name }}\n <${{ github.event.compare }}|Kolla ändringar> \"}}]}' 
+          CHANNEL_ID: ${{ secrets.channelId }}
+          REPO: ${{ github.event.repository.name }}
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+          PUSHER: ${{ github.event.pusher.name }}
+          COMPARE_URL: ${{ github.event.compare }}
+        run: |
+          set -euo pipefail
+
+          payload="$(cat <<'JSON'
+          {
+            "channel": "__CHANNEL_ID__",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*[__REPO__]:* __COMMIT_MSG__\n *Av:* __PUSHER__\n <__COMPARE_URL__|Kolla ändringar>"
+                }
+              }
+            ]
+          }
+          JSON
+          )"
+
+          payload="${payload/__CHANNEL_ID__/${CHANNEL_ID}}"
+          payload="${payload/__REPO__/${REPO}}"
+          payload="${payload/__COMMIT_MSG__/${COMMIT_MSG}}"
+          payload="${payload/__PUSHER__/${PUSHER}}"
+          payload="${payload/__COMPARE_URL__/${COMPARE_URL}}"
+
+          response="$(curl -sS -X POST \
+            -H "Content-type: application/json" \
+            -H "Authorization: Bearer ${SLACK_BOT_TOKEN}" \
+            --data "${payload}" \
+            https://slack.com/api/chat.postMessage)"
+
+          echo "${response}" | grep -q '"ok":true' || {
+            echo "Slack API error:"
+            echo "${response}"
+            exit 1
+          }
         if: success()
