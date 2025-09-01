@@ -23,7 +23,6 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Bygg Slack-payloaden
           payload="$(cat <<'JSON'
           {
             "channel": "__CHANNEL_ID__",
