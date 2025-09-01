@@ -11,10 +11,51 @@ jobs:
     name: Notify Slack on pushes
     runs-on: ubuntu-latest
     steps:
-      - uses: abinoda/slack-action@master
+      - name: Notify Slack on push
         env:
           SLACK_BOT_TOKEN: ${{ secrets.slackToken }}
-        with:
-          # message to send to slack
-          args: '{\"channel\":\"${{ secrets.channelId }}\",\"blocks\":[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*[${{ github.event.repository.name }}]*: ${{ github.event.pull_request.title }}\n Av: ${{ github.event.pull_request.user.login }}\n <${{ github.event.pull_request.html_url }}|PR ${{ github.event.pull_request.number }}> \"}}]}'
+          CHANNEL_ID: ${{ secrets.channelId }}
+          REPO: ${{ github.event.repository.name }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+
+          # Bygg Slack-payloaden
+          payload="$(cat <<'JSON'
+          {
+            "channel": "__CHANNEL_ID__",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*[__REPO__]*: __PR_TITLE__\n Av: __PR_AUTHOR__\n <__PR_URL__|PR __PR_NUMBER__>"
+                }
+              }
+            ]
+          }
+          JSON
+          )"
+
+          payload="${payload/__CHANNEL_ID__/${CHANNEL_ID}}"
+          payload="${payload/__REPO__/${REPO}}"
+          payload="${payload/__PR_TITLE__/${PR_TITLE}}"
+          payload="${payload/__PR_AUTHOR__/${PR_AUTHOR}}"
+          payload="${payload/__PR_URL__/${PR_URL}}"
+          payload="${payload/__PR_NUMBER__/${PR_NUMBER}}"
+
+          response="$(curl -sS -X POST \
+            -H "Content-type: application/json" \
+            -H "Authorization: Bearer ${SLACK_BOT_TOKEN}" \
+            --data "${payload}" \
+            https://slack.com/api/chat.postMessage)"
+
+          echo "${response}" | grep -q '"ok":true' || {
+            echo "Slack API error:"
+            echo "${response}"
+            exit 1
+          }
         if: success()
