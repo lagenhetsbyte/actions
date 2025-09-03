@@ -22,30 +22,27 @@ jobs:
         run: |
           set -euo pipefail
 
-          payload="$(cat <<'JSON'
-          {
-            "channel": "__CHANNEL_ID__",
-            "blocks": [
-              {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "*[__REPO__]:* __COMMIT_MSG__\n *Av:* __PUSHER__\n <__COMPARE_URL__|Kolla ändringar>"
+          payload="$(jq -n \
+            --arg channel "$CHANNEL_ID" \
+            --arg repo "$REPO" \
+            --arg msg "$COMMIT_MSG" \
+            --arg pusher "$PUSHER" \
+            --arg url "$COMPARE_URL" \
+            '{
+              channel: $channel,
+              blocks: [
+                {
+                  type: "section",
+                  text: {
+                    type: "mrkdwn",
+                    text: ("*[" + $repo + "]:* " + $msg + "\n *Av:* " + $pusher + "\n <" + $url + "|Kolla ändringar>")
+                  }
                 }
-              }
-            ]
-          }
-          JSON
-          )"
-
-          payload="${payload/__CHANNEL_ID__/${CHANNEL_ID}}"
-          payload="${payload/__REPO__/${REPO}}"
-          payload="${payload/__COMMIT_MSG__/${COMMIT_MSG}}"
-          payload="${payload/__PUSHER__/${PUSHER}}"
-          payload="${payload/__COMPARE_URL__/${COMPARE_URL}}"
+              ]
+            }')"
 
           response="$(curl -sS -X POST \
-            -H "Content-type: application/json" \
+            -H "Content-Type: application/json; charset=utf-8" \
             -H "Authorization: Bearer ${SLACK_BOT_TOKEN}" \
             --data "${payload}" \
             https://slack.com/api/chat.postMessage)"

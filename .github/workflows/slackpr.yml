@@ -23,31 +23,28 @@ jobs:
         run: |
           set -euo pipefail
 
-          payload="$(cat <<'JSON'
-          {
-            "channel": "__CHANNEL_ID__",
-            "blocks": [
-              {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "*[__REPO__]*: __PR_TITLE__\n Av: __PR_AUTHOR__\n <__PR_URL__|PR __PR_NUMBER__>"
+          payload="$(jq -n \
+            --arg channel "$CHANNEL_ID" \
+            --arg repo "$REPO" \
+            --arg title "$PR_TITLE" \
+            --arg author "$PR_AUTHOR" \
+            --arg url "$PR_URL" \
+            --arg number "$PR_NUMBER" \
+            '{
+              channel: $channel,
+              blocks: [
+                {
+                  type: "section",
+                  text: {
+                    type: "mrkdwn",
+                    text: ("*[" + $repo + "]*: " + $title + "\n Av: " + $author + "\n <" + $url + "|PR " + $number + ">")
+                  }
                 }
-              }
-            ]
-          }
-          JSON
-          )"
-
-          payload="${payload/__CHANNEL_ID__/${CHANNEL_ID}}"
-          payload="${payload/__REPO__/${REPO}}"
-          payload="${payload/__PR_TITLE__/${PR_TITLE}}"
-          payload="${payload/__PR_AUTHOR__/${PR_AUTHOR}}"
-          payload="${payload/__PR_URL__/${PR_URL}}"
-          payload="${payload/__PR_NUMBER__/${PR_NUMBER}}"
+              ]
+            }')"
 
           response="$(curl -sS -X POST \
-            -H "Content-type: application/json" \
+            -H "Content-Type: application/json; charset=utf-8" \
             -H "Authorization: Bearer ${SLACK_BOT_TOKEN}" \
             --data "${payload}" \
             https://slack.com/api/chat.postMessage)"
